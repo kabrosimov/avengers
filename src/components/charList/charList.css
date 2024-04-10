@@ -45,3 +45,30 @@
     text-transform: uppercase;
     color: #fff
 }
+
+.my-node-enter {
+    opacity: 0;
+    /* transform: translateY(-500px); */
+    /* transform: translate3d(-500px, 0, 500px); */
+    transform: scale(0.2) translateY(-500px);
+
+}
+
+.my-node-enter-active {
+    opacity: 1;
+    /* transform: translateY(0);
+     */
+    transform: scale(1) translateY(0);
+    /* transform: translate3d(0, 0, 0); */
+    transition: all 500ms ease-in;
+}
+
+.my-node-exit {
+    opacity: 1;
+    transform: rotate(720deg);
+}
+
+.my-node-exit-active {
+    opacity: 0;
+    transition: opacity 500ms ease-in;
+}

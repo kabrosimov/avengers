@@ -1,67 +1,78 @@
-/* eslint-disable default-case */
-import { useState } from "react";
-import AppHeader from "../appHeader/AppHeader";
-import RandomCharacter from "../randomCharracter/RandomCharacter";
-import CharList from "../charList/CharList";
-import CharInfo from "../charInfo/CharInfo";
-import vision from "../../resources/img/vision.png";
-import AppBanner from "../appBanner/AppBanner";
-import ComicsList from "../comicsList/ComicsList";
-import SingleComic from "../singleComic/SingleComic";
-import ErrorBoundary from "../errorBoundary/ErrorBoundary";
-// import MarvelService from "../../services/MarvelService";
+import { lazy, Suspense } from 'react';
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import AppHeader from '../appHeader/AppHeader';
+import Spinner from '../spinner/Spinner';
+// import { MainPage, ComicsPage, SingleComicPage } from '../pages';
+
+const Page404 = lazy(() => import('../../pages/404'));
+const MainPage = lazy(() => import('../../pages/MainPage'));
+const ComicsPage = lazy(() => import('../../pages/ComicsPage'));
+// const SingleComicPage = lazy(
+//     () => import('../../pages/singleComicPage/SingleComicPage'),
+// );
+const SinglePage = lazy(() => import('../../pages/SinglePage'));
+const SingleComicLayout = lazy(
+    () => import('../../pages/singleComicLayout/SingleComicLayout'),
+);
+const SingleCharLayout = lazy(
+    () => import('../../pages/singleCharLayout/SingleCharLayout'),
+);
 
 const App = () => {
-  const [selectedCardId, setSelectedCard] = useState(null);
-
-  const onCharSelected = (id) => {
-    setSelectedCard(id);
-  };
-
-  const curentPage = 0;
-  const pageContent = (numPage) => {
-    switch (numPage) {
-      case 0: {
-        return (
-          <main>
-            <RandomCharacter />
-            <div className="char__content">
-              <CharList onCharSelected={onCharSelected} />
-              <ErrorBoundary>
-                <CharInfo charId={selectedCardId} />
-              </ErrorBoundary>
-
-              {/* <h1>Helloo worls</h1> */}
-            </div>
-            <img className="bg-decoration" src={vision} alt="vision" />
-          </main>
-        );
-      }
-      case 1: {
-        return (
-          <main>
-            <AppBanner />
-            <ComicsList />
-          </main>
-        );
-      }
-      case 2: {
-        return (
-          <main>
-            <AppBanner />
-            <SingleComic />
-          </main>
-        );
-      }
-    }
-  };
-
-  return (
-    <div className="app">
-      <AppHeader />
-      {pageContent(curentPage)}
-    </div>
-  );
+    return (
+        <Router>
+            <main>
+                <div className="app">
+                    <AppHeader />
+                    <main>
+                        <Suspense
+                            fallback={
+                                <span>
+                                    {' '}
+                                    <Spinner></Spinner>{' '}
+                                </span>
+                            }
+                        >
+                            <Routes>
+                                <Route path="/" element={<MainPage />} />
+                                <Route
+                                    path="/comics"
+                                    element={<ComicsPage />}
+                                />
+                                {/* <Route
+                                    path="/comics/:comicID"
+                                    element={<SingleComicPage />}
+                                />
+                                <Route
+                                    path="/characters/:charName"
+                                    element={<SingleComicPage />}
+                                /> */}
+                                <Route
+                                    path="/comics/:id"
+                                    element={
+                                        <SinglePage
+                                            Component={SingleComicLayout}
+                                            dataType="comic"
+                                        />
+                                    }
+                                />
+                                <Route
+                                    path="/characters/:id"
+                                    element={
+                                        <SinglePage
+                                            Component={SingleCharLayout}
+                                            dataType="character"
+                                        />
+                                    }
+                                />
+                                <Route path="*" element={<Page404 />} />
+                            </Routes>
+                        </Suspense>
+                    </main>
+                </div>
+            </main>
+        </Router>
+    );
 };
 
 export default App;
