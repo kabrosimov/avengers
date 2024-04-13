@@ -8,11 +8,15 @@ import { Link } from 'react-router-dom';
 
 const CharSearch = () => {
     const [char, setChar] = useState(null);
-    const { getCharacterByName, clearError } = useMarvelService();
+    const { getCharacterByName, clearError, process, setProcess } =
+        useMarvelService();
 
     const searchChar = async name => {
         clearError();
-        await getCharacterByName(name).then(onCharLoaded);
+
+        await getCharacterByName(name)
+            .then(onCharLoaded)
+            .then(() => setProcess('confirmed'));
         // setChar(null);
         // this.foo.bar = 0;
     };
@@ -29,6 +33,7 @@ const CharSearch = () => {
                 The character was not found. Check the name and try again
             </div>
         ) : null;
+    const loading = process == 'loading';
     return (
         <Formik
             initialValues={{
@@ -59,6 +64,7 @@ const CharSearch = () => {
                                 <button
                                     className="button button__main"
                                     type="submit"
+                                    disabled={loading}
                                 >
                                     <div className="inner">Find</div>
                                 </button>

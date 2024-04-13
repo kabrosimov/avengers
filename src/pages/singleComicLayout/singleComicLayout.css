@@ -1,5 +1,5 @@
 .single-comic {
-    margin-top: 50px;
+    /* margin-top: 50px; */
     display: -ms-grid;
     display: grid;
     -ms-grid-columns: 293px 550px auto;

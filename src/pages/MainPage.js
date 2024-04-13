@@ -16,6 +16,7 @@ const MainPage = () => {
     const onCharSelected = id => {
         setSelectedCard(id);
     };
+    // console.log('render mauin');
     return (
         <>
             <Helmet>

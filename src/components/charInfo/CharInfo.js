@@ -1,16 +1,18 @@
 import { useState, useEffect } from 'react';
-import Skeleton from '../skeleton/Skeleton';
-import Spinner from '../spinner/Spinner';
-import ErrorMessage from '../errorMessage/ErrorMessage';
+// import Skeleton from '../skeleton/Skeleton';
+// import Spinner from '../spinner/Spinner';
+// import ErrorMessage from '../errorMessage/ErrorMessage';
 import PropTypes from 'prop-types';
 import useMarvelService from '../../services/MarvelService';
+import setContent from '../../utils/setContent';
 
 import './charInfo.css';
 
 const CharInfo = props => {
     const [char, setChar] = useState(null);
 
-    const { error, loading, getCharacter, clearError } = useMarvelService();
+    const { getCharacter, clearError, process, setProcess } =
+        useMarvelService();
 
     useEffect(() => {
         updateChar();
@@ -22,7 +24,9 @@ const CharInfo = props => {
             return;
         }
         clearError();
-        getCharacter(charId).then(onCharLoaded);
+        getCharacter(charId)
+            .then(onCharLoaded)
+            .then(() => setProcess('confirmed'));
 
         // this.foo.bar = 0;
     };
@@ -31,24 +35,26 @@ const CharInfo = props => {
         // this.setState({ char, loading: false });
     };
 
-    const skeleton = !(error || loading || char) ? <Skeleton /> : null;
-    const errorMessage = error ? <ErrorMessage /> : null;
-    const spinner = loading ? <Spinner /> : null;
-    const content = !(errorMessage || spinner || !char) ? (
-        <View char={char} />
-    ) : null;
+    // const skeleton = !(error || loading || char) ? <Skeleton /> : null;
+    // const errorMessage = error ? <ErrorMessage /> : null;
+    // const spinner = loading ? <Spinner /> : null;
+    // const content = !(errorMessage || spinner || !char) ? (
+    //     <View char={char} />
+    // ) : null;
     return (
         <div className="char__info">
-            {skeleton}
+            {setContent(process, View, char)}
+
+            {/* {skeleton}
             {errorMessage}
             {spinner}
-            {content}
+            {content} */}
         </div>
     );
 };
 
-const View = ({ char }) => {
-    const { name, fullDescription, thumbnail, homepage, wiki, comics } = char;
+const View = ({ data }) => {
+    const { name, fullDescription, thumbnail, homepage, wiki, comics } = data;
     let notFoundStyle = {};
     if (thumbnail.includes('image_not_available.jpg')) {
         notFoundStyle = { objectFit: 'unset' };

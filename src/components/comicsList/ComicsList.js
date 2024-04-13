@@ -1,13 +1,12 @@
 import './comicsList.css';
 import useMarvelService from '../../services/MarvelService';
 import { useEffect, useState } from 'react';
-import Spinner from '../spinner/Spinner';
-import ErrorMessage from '../errorMessage/ErrorMessage';
+import { setContentCardList } from '../../utils/setContent';
 
 import { Link } from 'react-router-dom';
 
 const ComicsList = () => {
-    const { loading, error, getAllComics } = useMarvelService();
+    const { getAllComics, process, setProcess } = useMarvelService();
     const [comicsList, setComicsList] = useState([]);
     const [offset, setOffset] = useState(520);
     const [newComicsLoading, setNewComicsLoading] = useState(false);
@@ -17,19 +16,18 @@ const ComicsList = () => {
     }, []);
 
     const loadComics = (limit, initial = true) => {
-        // setNewComicsLoading(!initial);
         initial ? setNewComicsLoading(false) : setNewComicsLoading(true);
         // setNewComicsLoading(true);
-        getAllComics(limit, offset).then(onComicsListLoaded);
+        getAllComics(limit, offset)
+            .then(onComicsListLoaded)
+            .then(() => setProcess('confirmed'));
     };
 
     const onComicsListLoaded = newList => {
         setComicsList(oldList => [...oldList, ...newList]);
         setOffset(offset => offset + 8);
         setNewComicsLoading(false);
-        // console.log(comicsList);
     };
-    // const arrRef = useRef([]);
 
     const renderComisc = arr => {
         const tempComicsList = arr.map(item => {
@@ -43,16 +41,8 @@ const ComicsList = () => {
             }
 
             return (
-                <li
-                    className="comics__item"
-                    // tabIndex={0}
-                    id={id}
-                    key={id}
-                    // ref={(el) => arrRef.current.push(el)}
-                    // onClick={() => }
-                >
+                <li className="comics__item" id={id} key={id}>
                     <Link to={`/comics/${id}`}>
-                        {/* <a href={itemProps.homepage}> */}
                         <img
                             style={thumbStyle}
                             src={itemProps.thumbnail}
@@ -65,7 +55,6 @@ const ComicsList = () => {
                         <div className="comics__item-price">
                             {price ? `${price}$` : null}
                         </div>
-                        {/* </a> */}
                     </Link>
                 </li>
             );
@@ -73,15 +62,13 @@ const ComicsList = () => {
         return <ul className="comics__grid">{tempComicsList}</ul>;
     };
 
-    const errorMessage = error ? <ErrorMessage /> : null;
-    const spinner = loading && !newComicsLoading ? <Spinner /> : null;
-    const content = renderComisc(comicsList);
-
     return (
         <div className="comics__list">
-            {errorMessage}
-            {spinner}
-            {content}
+            {setContentCardList(
+                process,
+                () => renderComisc(comicsList),
+                newComicsLoading,
+            )}
             <button
                 className="button button__main button__long"
                 onClick={() => loadComics(8, false)}
